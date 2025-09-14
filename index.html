@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Leaflet - Pertemuan 2</title>
+
+    <!-- Leaflet CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+      /* Fullscreen map */
+      html,
+      body,
+      #map {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      /* Simple popup styling inside page */
+      .info {
+        position: absolute;
+        z-index: 1000;
+        left: 10px;
+        top: 10px;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 8px 12px;
+        border-radius: 6px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+        font-family: sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="info">Leaflet.js — Peta dasar OSM dengan marker kampus</div>
+
+    <div id="map"></div>
+
+    <!-- Leaflet JS -->
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-kxQm0p0rS0h+Qf5mWQ5p/8Z8Q3g1f7F8d6t1g4u5r1o="
+      crossorigin=""
+    ></script>
+
+    <script>
+      // Inisialisasi peta
+      const map = L.map("map").setView([-2.5, 118.0], 5);
+
+      // Base layer OpenStreetMap
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap contributors",
+      }).addTo(map);
+
+      // Koordinat Kampus
+      const kampusLat = -8.796074153896708;
+      const kampusLng = 115.1762168842497;
+      const kampusName =
+        "Universitas Udayana, Fakultas Teknik, Program Studi Teknologi Informasi";
+      const kampusAddress =
+        "Jl. Raya Kampus Udayana, Jimbaran, Kec. Kuta Selatan, Kabupaten Badung, Bali";
+
+      // Default icon
+      const defaultIcon = L.icon({
+        iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+        iconRetinaUrl:
+          "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+        shadowUrl:
+          "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41],
+      });
+
+      // Tambah marker kampus
+      const kampusMarker = L.marker([kampusLat, kampusLng], {
+        icon: defaultIcon,
+      }).addTo(map);
+      kampusMarker
+        .bindPopup(`<b>${kampusName}</b><br>${kampusAddress}`)
+        .openPopup();
+
+      // Tambah beberapa marker tambahan contoh
+      const tambahan = [
+        {
+          lat: -8.7978598,
+          lng: 115.1752973,
+          title:
+            "Universitas Udayana, Fakultas Teknik, Program Studi Teknik Sipil",
+        },
+        {
+          lat: -8.7982995,
+          lng: 115.1698769,
+          title: "Rektorat Universitas Udayana",
+        },
+        {
+          lat: -8.6729515,
+          lng: 115.2168203,
+          title: "Kampus Universitas Udayana Sudirman",
+        },
+      ];
+      tambahan.forEach((item) => {
+        L.marker([item.lat, item.lng])
+          .addTo(map)
+          .bindPopup(`<b>${item.title}</b>`);
+      });
+
+      const customIcon = L.icon({
+        iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -28],
+      });
+
+      L.control.scale().addTo(map);
+    </script>
+  </body>
+</html>
