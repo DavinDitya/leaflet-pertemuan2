@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Tugas GIS - Leaflet</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+      html,
+      body,
+      #map {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      .info {
+        position: absolute;
+        z-index: 1000;
+        left: 10px;
+        top: 10px;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 8px 12px;
+        border-radius: 6px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+        font-family: sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="info">Peta Interaktif Desa/Kota Asal</div>
+    <div id="map"></div>
+
+    <script>
+      // Inisialisasi peta
+      const map = L.map("map").setView([-8.65, 115.22], 13);
+
+      // Basemap OSM
+      const osm = L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+          maxZoom: 19,
+          attribution: "&copy; OpenStreetMap contributors",
+        }
+      );
+
+      // Basemap Satellite (Esri)
+      const esriSat = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        {
+          attribution: "Tiles &copy; Esri",
+          maxZoom: 19,
+        }
+      );
+
+      osm.addTo(map); // default layer
+
+      // MARKER
+      const rumah = L.marker([
+        -8.677205952698067, 115.20796251555387,
+      ]).bindPopup(
+        "<b>Ini Rumah Saya</b><br>Yang berada di Jl. Rembulan No. 4B."
+      );
+      const kantor = L.marker([
+        -8.674798230869362, 115.21606239579438,
+      ]).bindPopup(
+        "<b>Kantor Perbekel Desa Dauh Puri Kelod</b><br>Kantor Desa Dauh Puri Kelod"
+      );
+      const sekolah = L.marker([
+        -8.676878060188832, 115.21772422421616,
+      ]).bindPopup(
+        "<b>Sekolah SMA Negeri 2 Denpasar</b><br>Ini merupakan Sekolah Menengah Atas saya yaitu SMA Negeri 2 Denpasar."
+      );
+      const pasar = L.marker([
+        -8.676681322557403, 115.21561348753887,
+      ]).bindPopup(
+        "<b>Pasar Sanglah</b><br>Pasar Sanglah yang terletak di dekat SMA Negeri 2 Denpasar"
+      );
+
+      const markers = L.layerGroup([rumah, kantor, sekolah, pasar]);
+
+      // POLYLINE
+      const jalurkesekolah = L.polyline(
+        [
+          [-8.677205952698067, 115.20796251555387], // rumah
+          [-8.677182969293348, 115.20802704630556],
+          [-8.677064620785625, 115.20804368188772],
+          [-8.677062317767316, 115.20816554200722],
+          [-8.677007363231155, 115.20814031746984],
+          [-8.676440300355402, 115.20819117831704],
+          [-8.676542529792014, 115.20902445733131],
+          [-8.676802349973881, 115.21009438412851],
+          [-8.676884272271678, 115.21023727082408],
+          [-8.67747957535957, 115.21021736409662],
+          [-8.67750652988048, 115.21060372849557],
+          [-8.677550832895927, 115.2109866818688],
+          [-8.677545620850108, 115.21174568186882],
+          [-8.677586014834404, 115.21230941070455],
+          [-8.677573090425692, 115.21350807572011],
+          [-8.677436575354692, 115.21526668186878],
+          [-8.673843529545117, 115.21546845740926],
+          [-8.673864835741167, 115.21622387431118],
+          [-8.673381651339744, 115.21622955795439],
+          [-8.67336309059175, 115.21624431010402],
+          [-8.673449850293695, 115.21657390694926],
+          [-8.673501588428044, 115.21722945176283],
+          [-8.673634138386978, 115.21797665352987],
+          [-8.676098392803755, 115.21763506044596],
+          [-8.676713928833172, 115.217520143521],
+          [-8.676878060188832, 115.21772422421616], // sekolah
+        ],
+        { color: "blue", weight: 6, opacity: 0.7 }
+      ).bindPopup("Jalur utama dari rumah ke sekolah");
+
+      const jalurkepasar = L.polyline(
+        [
+          [-8.677205952698067, 115.20796251555387], // rumah
+          [-8.677182969293348, 115.20802704630556],
+          [-8.677064620785625, 115.20804368188772],
+          [-8.677062317767316, 115.20816554200722],
+          [-8.677007363231155, 115.20814031746984],
+          [-8.676440300355402, 115.20819117831704],
+          [-8.676542529792014, 115.20902445733131],
+          [-8.676802349973881, 115.21009438412851],
+          [-8.676884272271678, 115.21023727082408],
+          [-8.67747957535957, 115.21021736409662],
+          [-8.67750652988048, 115.21060372849557],
+          [-8.677550832895927, 115.2109866818688],
+          [-8.677545620850108, 115.21174568186882],
+          [-8.677586014834404, 115.21230941070455],
+          [-8.677573090425692, 115.21350807572011],
+          [-8.677436575354692, 115.21526668186878],
+          [-8.676655084339659, 115.2153010158135],
+          [-8.676681322557403, 115.21561348753887], // pasar
+        ],
+        { color: "red", weight: 4, opacity: 0.7 }
+      ).bindPopup("Jalur dari rumah ke pasar");
+      const polylineLayer = L.layerGroup([jalurkesekolah, jalurkepasar]);
+
+      // POLYGON
+      const lapangan = L.polygon(
+        [
+          [-8.669262670878295, 115.23237583187279],
+          [-8.669386602258891, 115.23562135871695],
+          [-8.673186006989317, 115.23554748017251],
+          [-8.673007497686113, 115.2322511800635],
+        ],
+        { color: "green", fillColor: "#3f3", fillOpacity: 0.5 }
+      ).bindPopup("Lapangan Desa");
+      const polygonLayer = L.layerGroup([lapangan]);
+
+      // LAYER CONTROL
+      const baseMaps = {
+        OpenStreetMap: osm,
+        "Esri Satellite": esriSat,
+      };
+
+      const overlayMaps = {
+        "Marker Lokasi": markers,
+        "Jalur Jalan": polylineLayer,
+        "Area Lapangan": polygonLayer,
+      };
+
+      L.control.layers(baseMaps, overlayMaps).addTo(map);
+
+      // Tambahkan semua overlay ke peta awal
+      markers.addTo(map);
+      polylineLayer.addTo(map);
+      polygonLayer.addTo(map);
+
+      L.control.scale().addTo(map);
+    </script>
+  </body>
+</html>
