@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Peta Detail Wilayah - Kota Denpasar</title>
+
+    <!-- Leaflet CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+      html,
+      body,
+      #map {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      .info {
+        position: absolute;
+        z-index: 1000;
+        left: 10px;
+        top: 10px;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 8px 12px;
+        border-radius: 6px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+        font-family: "Segoe UI", sans-serif;
+        font-size: 14px;
+      }
+
+      .popup-detail {
+        font-family: "Segoe UI", sans-serif;
+        font-size: 13px;
+        line-height: 1.4em;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="info">
+      <b>Peta Detail Wilayah Kota Denpasar</b><br />
+      Menampilkan batas Kota, Kecamatan, dan Kelurahan
+    </div>
+    <div id="map"></div>
+
+    <script>
+      // Inisialisasi peta
+      const map = L.map("map").setView([-8.65, 115.22], 12);
+
+      // Basemap
+      const osm = L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+          maxZoom: 19,
+          attribution: "&copy; OpenStreetMap contributors",
+        }
+      ).addTo(map);
+
+      const satellite = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        { attribution: "Tiles © Esri", maxZoom: 19 }
+      );
+
+      // Style layer
+      const styleKota = {
+        color: "#1a1a1a",
+        weight: 3,
+        fillColor: "#cccccc",
+        fillOpacity: 0.1,
+      };
+      const styleKecamatan = {
+        color: "#0066ff",
+        weight: 2,
+        fillColor: "#66ccff",
+        fillOpacity: 0.15,
+      };
+      const styleKelurahan = {
+        color: "#ff6600",
+        weight: 1,
+        fillColor: "#ffcc99",
+        fillOpacity: 0.25,
+      };
+
+      let kotaLayer, kecamatanLayer, kelurahanLayer;
+
+      // Mapping kode kecamatan & nama kecamatan
+      const kecamatanMapping = {
+        "001": "Denpasar Selatan",
+        "002": "Denpasar Timur",
+        "003": "Denpasar Barat",
+        "004": "Denpasar Utara",
+      };
+
+      // ========================
+      // Kota Denpasar
+      // ========================
+      fetch("51.71_Kota_Denpasar.geojson")
+        .then((res) => res.json())
+        .then((data) => {
+          kotaLayer = L.geoJSON(data, {
+            style: styleKota,
+            onEachFeature: (feature, layer) => {
+              const namaKota = feature.properties.nm_dati2 || "Tidak diketahui";
+              layer.bindPopup(`
+                <div class="popup-detail">
+                  <b>Detail Wilayah:</b><br>
+                  <b>Kota:</b> ${namaKota}
+                </div>
+              `);
+            },
+          }).addTo(map);
+        });
+
+      // ========================
+      // Kecamatan
+      // ========================
+      fetch("51.71_kecamatan.geojson")
+        .then((res) => res.json())
+        .then((data) => {
+          kecamatanLayer = L.geoJSON(data, {
+            style: styleKecamatan,
+            onEachFeature: (feature, layer) => {
+              const namaKecamatan =
+                feature.properties.nm_kecamatan || "Tidak diketahui";
+              const kodeKecamatan =
+                feature.properties.kd_kecamatan || "Tidak diketahui";
+              layer.bindPopup(`
+                <div class="popup-detail">
+                  <b>Detail Wilayah:</b><br>
+                  <b>Kecamatan:</b> ${namaKecamatan}<br>
+                  <b>Kode Kecamatan:</b> ${kodeKecamatan}
+                </div>
+              `);
+            },
+          }).addTo(map);
+        });
+
+      // ========================
+      // Kelurahan
+      // ========================
+      fetch("51.71_kelurahan.geojson")
+        .then((res) => res.json())
+        .then((data) => {
+          kelurahanLayer = L.geoJSON(data, {
+            style: styleKelurahan,
+            onEachFeature: (feature, layer) => {
+              const kodeKec = feature.properties.kd_kecamatan;
+              const namaKec = kecamatanMapping[kodeKec] || "Tidak diketahui";
+              const namaKel =
+                feature.properties.nm_kelurahan || "Tidak diketahui";
+              layer.bindPopup(`
+                <div class="popup-detail">
+                  <b>Detail Wilayah:</b><br>
+                  <b>Kecamatan:</b> ${namaKec}<br>
+                  <b>Kelurahan:</b> ${namaKel}
+                </div>
+              `);
+            },
+          }).addTo(map);
+        });
+
+      // ========================
+      // Layer Control
+      // ========================
+      setTimeout(() => {
+        const baseMaps = {
+          OpenStreetMap: osm,
+          "Esri Satellite": satellite,
+        };
+
+        const overlayMaps = {
+          "Batas Kota Denpasar": kotaLayer,
+          "Batas Kecamatan": kecamatanLayer,
+          "Batas Kelurahan": kelurahanLayer,
+        };
+
+        L.control
+          .layers(baseMaps, overlayMaps, { collapsed: false })
+          .addTo(map);
+      }, 1500);
+
+      L.control.scale().addTo(map);
+    </script>
+  </body>
+</html>
